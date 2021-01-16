@@ -82,35 +82,35 @@ public class PetrolLogServiceImpl implements IPetrolLogService
      * @param petrolLog 加油采购入库记录
      * @return 结果
      */
-    @Override
-    public int updatePetrolLog(PetrolLog petrolLog)
-    {
-        PetrolStation _petrolStation = petrolStationMapper.selectPetrolStationById(petrolLog.getStationId());
-        PetrolLog _petrolLog = petrolLogMapper.selectPetrolLogByLogId(petrolLog.getLogId());
-        PetrolStation petrolStation = new PetrolStation();
-        petrolStation.setId(petrolLog.getStationId());
-        petrolStation.setPrice(petrolLog.getPrice());
-
-        if (null !=_petrolLog){
-            petrolStation.setRemainl(_petrolStation.getRemainl().subtract(_petrolLog.getLitre()).add(petrolLog.getLitre()));
-            petrolLogMapper.updatePetrolLogByLogId(petrolLog);
-        }else{
-            petrolLogMapper.insertPetrolLog(petrolLog);
-        }
-        return petrolStationMapper.updatePetrolStation(petrolStation);
-    }
 //    @Override
 //    public int updatePetrolLog(PetrolLog petrolLog)
 //    {
 //        PetrolStation _petrolStation = petrolStationMapper.selectPetrolStationById(petrolLog.getStationId());
-//        PetrolLog _petrolLog = petrolLogMapper.selectPetrolLogById(petrolLog.getId());
+//        PetrolLog _petrolLog = petrolLogMapper.selectPetrolLogByLogId(petrolLog.getLogId());
 //        PetrolStation petrolStation = new PetrolStation();
 //        petrolStation.setId(petrolLog.getStationId());
 //        petrolStation.setPrice(petrolLog.getPrice());
-//        petrolStation.setRemainl(_petrolStation.getRemainl().subtract(_petrolLog.getLitre()).add(petrolLog.getLitre()));
-//        petrolStationMapper.updatePetrolStation(petrolStation);
-//        return petrolLogMapper.updatePetrolLog(petrolLog);
+//
+//        if (null !=_petrolLog){
+//            petrolStation.setRemainl(_petrolStation.getRemainl().subtract(_petrolLog.getLitre()).add(petrolLog.getLitre()));
+//            petrolLogMapper.updatePetrolLogByLogId(petrolLog);
+//        }else{
+//            petrolLogMapper.insertPetrolLog(petrolLog);
+//        }
+//        return petrolStationMapper.updatePetrolStation(petrolStation);
 //    }
+    @Override
+    public int updatePetrolLog(PetrolLog petrolLog)
+    {
+        PetrolStation _petrolStation = petrolStationMapper.selectPetrolStationById(petrolLog.getStationId());
+        PetrolLog _petrolLog = petrolLogMapper.selectPetrolLogById(petrolLog.getId());
+        PetrolStation petrolStation = new PetrolStation();
+        petrolStation.setId(petrolLog.getStationId());
+        petrolStation.setPrice(petrolLog.getPrice());
+        petrolStation.setRemainl(_petrolStation.getRemainl().subtract(_petrolLog.getLitre()).add(petrolLog.getLitre()));
+        petrolStationMapper.updatePetrolStation(petrolStation);
+        return petrolLogMapper.updatePetrolLog(petrolLog);
+    }
 
 
     /**
