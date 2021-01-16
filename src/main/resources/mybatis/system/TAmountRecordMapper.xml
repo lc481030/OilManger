@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oil.project.system.record.mapper.TAmountRecordMapper">
+    
+    <resultMap type="TAmountRecord" id="TAmountRecordResult">
+        <result property="id"    column="id"    />
+        <result property="carId"    column="car_id"    />
+        <result property="carNumber"    column="car_number"    />
+        <result property="amount"    column="amount"    />
+        <result property="date"    column="date"    />
+        <result property="userId"    column="user_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="addtime"    column="addtime"    />
+        <result property="isdelete"    column="isdelete"    />
+        <result property="driver"    column="driver"    />
+        <result property="updatetime"    column="updatetime"    />
+        <result property="upateUserid"    column="upate_userid"    />
+        <result property="updateName"    column="update_name"    />
+    </resultMap>
+
+    <sql id="selectTAmountRecordVo">
+        select id, car_id, car_number, amount, date, user_id, user_name, addtime, isdelete, updatetime, upate_userid, update_name,driver from t_amount_record
+    </sql>
+
+    <select id="selectTAmountRecordList" parameterType="TAmountRecord" resultMap="TAmountRecordResult">
+        <include refid="selectTAmountRecordVo"/>
+        <where>
+            <if test="carId != null "> and car_id = #{carId}</if>
+            <if test="carNumber != null  and carNumber != ''"> and car_number = #{carNumber}</if>
+            <if test="amount != null "> and amount = #{amount}</if>
+            <if test="startDate != null and startDate!=''"> <![CDATA[ and DATE_FORMAT(date,'%Y-%m-%d') >= #{startDate}]]></if>
+            <if test="endDate != null and endDate!=''"> <![CDATA[ and DATE_FORMAT(date,'%Y-%m-%d') <= #{endDate}]]></if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
+            <if test="addtime != null "> and addtime = #{addtime}</if>
+            <if test="isdelete != null "> and isdelete = #{isdelete}</if>
+            <if test="driver != null and driver !='' "> and driver = #{driver}</if>
+            <if test="updatetime != null "> and updatetime = #{updatetime}</if>
+            <if test="upateUserid != null "> and upate_userid = #{upateUserid}</if>
+            <if test="updateName != null  and updateName != ''"> and update_name like concat('%', #{updateName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectTAmountRecordById" parameterType="Long" resultMap="TAmountRecordResult">
+        <include refid="selectTAmountRecordVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTAmountRecord" parameterType="TAmountRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into t_amount_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="carId != null">car_id,</if>
+            <if test="carNumber != null">car_number,</if>
+            <if test="amount != null">amount,</if>
+            <if test="date != null">date,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="userName != null">user_name,</if>
+            <if test="addtime != null">addtime,</if>
+            <if test="isdelete != null">isdelete,</if>
+            <if test="driver != null">driver,</if>
+            <if test="updatetime != null">updatetime,</if>
+            <if test="upateUserid != null">upate_userid,</if>
+            <if test="updateName != null">update_name,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="carId != null">#{carId},</if>
+            <if test="carNumber != null">#{carNumber},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="date != null">#{date},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="userName != null">#{userName},</if>
+            <if test="addtime != null">#{addtime},</if>
+            <if test="isdelete != null">#{isdelete},</if>
+            <if test="driver != null">#{driver},</if>
+            <if test="updatetime != null">#{updatetime},</if>
+            <if test="upateUserid != null">#{upateUserid},</if>
+            <if test="updateName != null">#{updateName},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTAmountRecord" parameterType="TAmountRecord">
+        update t_amount_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="carId != null">car_id = #{carId},</if>
+            <if test="carNumber != null">car_number = #{carNumber},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="date != null">date = #{date},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="addtime != null">addtime = #{addtime},</if>
+            <if test="isdelete != null">isdelete = #{isdelete},</if>
+            <if test="driver != null">driver = #{driver},</if>
+            <if test="updatetime != null">updatetime = #{updatetime},</if>
+            <if test="upateUserid != null">upate_userid = #{upateUserid},</if>
+            <if test="updateName != null">update_name = #{updateName},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTAmountRecordById" parameterType="Long">
+        delete from t_amount_record where id = #{id}
+    </delete>
+
+    <delete id="deleteTAmountRecordByIds" parameterType="String">
+        delete from t_amount_record where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
