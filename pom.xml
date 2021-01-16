@@ -10,7 +10,7 @@
 
     <name>oli</name>
     <url></url>
-    <description>若依管理系统</description>
+    <description>加油管理系统</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -176,6 +176,12 @@
             <artifactId>spring-context-support</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.8</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- 定时任务 -->
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
@@ -257,6 +263,10 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
 
     </dependencies>

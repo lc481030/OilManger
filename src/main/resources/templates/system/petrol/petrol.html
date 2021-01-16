@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('车辆加油记录列表')" />
+    <th:block th:include="include :: select2-css" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+
+            <div class="col-sm-12 search-collapse">
+                <form id="formId1">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>加油地点：</label>
+                                <select name="stationId" class="form-control" width="50" >
+                                    <option value="">选择加油站</option>
+                                    <option th:each="station : ${stationList}" th:price = "${station.price}" th:text="${station.title}" th:value="${station.id}"></option>
+                                </select>
+                                <input name="stationTitle" value=""  class="form-control" type="hidden">
+                            </li>
+
+                            <li class="select-time">
+                                <label>加油单价：</label>
+                                <input type="text" class="form-control" id="price" placeholder="加油单价" required name="price"/>
+                            </li>
+                            <li class="select-time">
+                                <label>加油日期：</label>
+                                <input type="text" class="time-input" id="petrolTime" placeholder="运输时间" required name="petrolTime"/>
+                            </li>
+
+                            <li>
+                                <label>车牌号：</label>
+                                <select name="carId" id="carId" class="form-control" width="50" onchange="carChange()">
+                                    <option value="">选择车辆</option>
+                                    <option th:each="car : ${carList}"  th:driver="${car.driver}"   th:carNumber="${car.carNum}"   th:text="${car.carNum+'['+car.driver+']'}" th:value="${car.id}"></option>
+                                </select>
+                                <input name="carNumber" value=""  class="form-control" type="hidden">
+                                <input name="driver" value=""  class="form-control" type="hidden">
+                            </li>
+                            <li class="select-time">
+                                <label>加油升数：</label>
+                                <input type="text" class="form-control" id="litre" placeholder="加油总升数" onkeypress="addLitre()" required name="litre"/>
+                            </li>
+                            <li class="select-time">
+                                <label>合计金额：</label>
+                                <input type="text" class="form-control" id="amount" placeholder="合计金额" onkeypress="addAmount()"  required name="amount"/>
+                            </li>
+
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="submitData()"><i class="fa fa-search"></i>&nbsp;添加</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+
+
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>车牌号：</label>
+                                <select name="params[carId]" class="form-control" width="50" >
+                                    <option value="">选择车辆</option>
+                                    <option th:each="car : ${carList}"  th:text="${car.carNum+'['+car.driver+']'}" th:value="${car.id}"></option>
+                                </select>
+                            </li>
+
+                            <li class="select-time">
+                                <label>加油日期：</label>
+                                <input type="text" class="time-input" id="beginPetrolTime" placeholder="开始时间" name="params[beginPetrolTime]"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" id="endPetrolTime" placeholder="结束时间" name="params[endPetrolTime]"/>
+                            </li>
+
+                            <li class="select-time">
+                                <label>录入时间：</label>
+                                <input type="text" class="time-input" id="beginAddtime" placeholder="开始时间" name="params[beginAddtime]"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" id="endAddtime" placeholder="结束时间" name="params[endAddtime]"/>
+                            </li>
+
+
+
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search2()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:petrol:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:petrol:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:petrol:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:petrol:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+     <th:block th:include="include :: datetimepicker-js" />
+     <th:block th:include="include :: select2-js" />
+
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:petrol:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:petrol:remove')}]];
+        var prefix = ctx + "system/petrol";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "车辆加油记录",
+                sortName: "id",
+                sortOrder: "desc",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'id',
+                    title: '加油记录',
+                    visible: false
+                },
+
+                {
+                    field: 'carNumber',
+                    title: '车牌号'
+                },
+                {
+                    field: 'driver',
+                    title: '司机姓名'
+                },
+                {
+                    field: 'price',
+                    title: '加油单价'
+                },
+                {
+                    field: 'litre',
+                    title: '加油总升数'
+                },
+                {
+                    field: 'amount',
+                    title: '合计金额'
+                },
+                {
+                    field: 'petrolTime',
+                    title: '加油日期',
+                    formatter: function(value, row, index) {
+                        if(value=='' ||value==undefined){
+                            return value;
+                        }
+                        var myDate = new Date(value);
+                        //获取当前年
+                        var year=myDate.getFullYear();
+                        //获取当前月
+                        var month=myDate.getMonth()+1;
+                        month = month < 10 ? "0"+month : month;
+                        //获取当前日
+                        var date=myDate.getDate();
+                        date = date < 10 ? "0"+date : date;
+                        var h=myDate.getHours();       //获取当前小时数(0-23)
+                        h = h < 10 ? "0"+h : h;
+                        var m=myDate.getMinutes();     //获取当前分钟数(0-59)
+                        m = m < 10 ? "0"+m : m;
+                        var s=myDate.getSeconds();
+                        s = s < 10 ? "0"+s : s;
+                        var time =year+'-'+month+"-"+date;
+                        return time;
+                    }
+                },
+                {
+                    field: 'userName',
+                    title: '录入者'
+                },
+                {
+                    field: 'addtime',
+                    title: '录入时间',
+                    formatter: function(value, row, index) {
+                        if(value=='' ||value==undefined){
+                            return value;
+                        }
+                        var myDate = new Date(value);
+                        //获取当前年
+                        var year=myDate.getFullYear();
+                        //获取当前月
+                        var month=myDate.getMonth()+1;
+                        month = month < 10 ? "0"+month : month;
+                        //获取当前日
+                        var date=myDate.getDate();
+                        date = date < 10 ? "0"+date : date;
+                        var h=myDate.getHours();       //获取当前小时数(0-23)
+                        h = h < 10 ? "0"+h : h;
+                        var m=myDate.getMinutes();     //获取当前分钟数(0-59)
+                        m = m < 10 ? "0"+m : m;
+                        var s=myDate.getSeconds();
+                        s = s < 10 ? "0"+s : s;
+                        var time =year+'-'+month+"-"+date;
+                        return time;
+                    }
+                },
+                /*{
+                    field: 'updateTime',
+                    title: '修改时间'
+                },
+                {
+                    field: 'updateName',
+                    title: '修改人'
+                },*/
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+
+        $("select[name='carId']").on("change",function () {
+            $("input[name='carNumber']").val($("select[name='carId']").find("option[value='"+this.value+"']").attr("carNumber"));
+            $("input[name='driver']").val($("select[name='carId']").find("option[value='"+this.value+"']").attr("driver"));
+        });
+
+        $("select[name='stationId']").on("change",function () {
+            if(this.value!=''){
+                $("input[name='price']").val($("select[name='stationId']").find("option[value='"+this.value+"']").attr("price")) ;
+            }
+            $("input[name='stationTitle']").val($("select[name='stationId']").find("option[value='"+this.value+"']").text());
+        });
+
+
+
+        $("input[name='price']").on("keyup",function () {
+            var val = this.value;
+            var litre = $("input[name='litre']").val();
+            if(litre != '' && val > 0){
+                $("input[name='amount']").val((val*litre).toFixed(2));
+            }
+        });
+
+        $("input[name='litre']").on("keyup",function () {
+            var val = this.value;
+            var price = $("input[name='price']").val();
+            if(price != '' && val > 0){
+                $("input[name='amount']").val((val*price).toFixed(2));
+            }
+        });
+
+
+        function carChange() {
+            setTimeout(function(){
+                $("#litre").focus();
+            },100);
+        }
+
+        function addLitre() {
+            if(event.keyCode==13) {
+                setTimeout(function(){
+                    $("#amount").focus();
+                },100);
+            }
+        }
+
+        function addAmount() {
+            if(event.keyCode==13) {
+                setTimeout(function(){
+                    $("#amount").blur();
+                    submitData();
+                },100);
+            }
+        }
+
+
+        function submitData() {
+            if(confirm("确定添加该条运输信息吗?")){
+                if ($.validate.form()) {
+                    var data = $('#formId1').serialize();
+                    $.ajax({
+                        url:prefix + "/add",
+                        type: "post",
+                        dataType: "json",
+                        data: data,
+                        success: function(data) {
+                            $("#litre").val("")
+                            setTimeout(function(){
+                                $("#carId").focus();
+                            },100);
+                            $.table.search2()
+                        }
+                    });
+                }
+            }else{
+                setTimeout(function(){
+                    $("#carId").focus();
+                },100);
+            }
+        }
+
+
+    </script>
+</body>
+</html>

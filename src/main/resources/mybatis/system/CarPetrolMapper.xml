@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oil.project.system.petrol.mapper.CarPetrolMapper">
+    
+    <resultMap type="CarPetrol" id="CarPetrolResult">
+        <result property="id"    column="id"    />
+        <result property="carId"    column="car_id"    />
+        <result property="carNumber"    column="car_number"    />
+        <result property="price"    column="price"    />
+        <result property="litre"    column="litre"    />
+        <result property="amount"    column="amount"    />
+        <result property="petrolTime"    column="petrol_time"    />
+        <result property="userId"    column="user_id"    />
+        <result property="addtime"    column="addtime"    />
+        <result property="isdelete"    column="isdelete"    />
+        <result property="updateTime"    column="updatetime"    />
+        <result property="upateUserid"    column="upate_userid"    />
+
+        <result property="driver"    column="driver"    />
+        <result property="stationId"    column="station_id"    />
+        <result property="stationTitle"    column="station_title"    />
+        <result property="userName"    column="user_name"    />
+        <result property="updateName"    column="update_name"    />
+
+    </resultMap>
+
+    <sql id="selectCarPetrolVo">
+        select id, car_id, car_number, price, litre, amount, petrol_time, user_id, addtime, isdelete, updatetime, upate_userid,
+            driver,
+            station_id,
+            station_title,
+            user_name,
+            update_name
+         from t_car_petrol
+    </sql>
+
+    <select id="selectCarPetrolList" parameterType="CarPetrol" resultMap="CarPetrolResult">
+        <include refid="selectCarPetrolVo"/>
+        <where>
+          1=1 and isdelete = 0
+            <if test="carId != null "> and car_id = #{carId}</if>
+            <if test="carNumber != null  and carNumber != ''"> and car_number = #{carNumber}</if>
+
+            <if test="driver != null  and driver != ''"> and driver like concat('%', #{driver}, '%')   </if>
+
+            <if test="price != null "> and price = #{price}</if>
+            <if test="litre != null "> and litre = #{litre}</if>
+            <if test="amount != null "> and amount = #{amount}</if>
+            <if test="petrolTime != null "> and petrol_time = #{petrolTime}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="addtime != null "> and addtime = #{addtime}</if>
+            <if test="isdelete != null "> and isdelete = #{isdelete}</if>
+            <if test="updateTime != null "> and updatetime = #{updateTime}</if>
+            <if test="upateUserid != null  and upateUserid != ''"> and upate_userid = #{upateUserid}</if>
+
+            <if test="params.carId != null and params.carId != ''"><!-- 开始时间检索 -->
+                and car_id = #{params.carId}
+            </if>
+
+            <if test="params.beginPetrolTime != null and params.beginPetrolTime != ''"><!-- 开始时间检索 -->
+                and date_format(petrol_time,'%y%m%d') &gt;= date_format(#{params.beginPetrolTime},'%y%m%d')
+            </if>
+            <if test="params.endPetrolTime != null and params.endPetrolTime != ''"><!-- 结束时间检索 -->
+                and date_format(petrol_time,'%y%m%d') &lt;= date_format(#{params.endPetrolTime},'%y%m%d')
+            </if>
+
+            <if test="params.beginAddtime != null and params.beginAddtime != ''"><!-- 开始时间检索 -->
+                and date_format(addtime,'%y%m%d') &gt;= date_format(#{params.beginAddtime},'%y%m%d')
+            </if>
+            <if test="params.endAddtime != null and params.endAddtime != ''"><!-- 结束时间检索 -->
+                and date_format(addtime,'%y%m%d') &lt;= date_format(#{params.endAddtime},'%y%m%d')
+            </if>
+
+
+
+        </where>
+    </select>
+    
+    <select id="selectCarPetrolById" parameterType="Long" resultMap="CarPetrolResult">
+        <include refid="selectCarPetrolVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCarPetrol" parameterType="CarPetrol" useGeneratedKeys="true" keyProperty="id">
+        insert into t_car_petrol
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="carId != null">car_id,</if>
+            <if test="carNumber != null  and carNumber != ''">car_number,</if>
+            <if test="price != null">price,</if>
+            <if test="litre != null">litre,</if>
+            <if test="amount != null">amount,</if>
+            <if test="petrolTime != null">petrol_time,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="addtime != null">addtime,</if>
+            <if test="isdelete != null">isdelete,</if>
+            <if test="updateTime != null">updatetime,</if>
+            <if test="upateUserid != null">upate_userid,</if>
+
+            <if test="driver != null and driver!='' ">driver,</if>
+            <if test="stationId != null" >station_id,</if>
+            <if test="stationTitle != null and stationTitle!='' ">station_title,</if>
+            <if test="userName != null and userName!='' ">user_name,</if>
+            <if test="updateName != null and updateName!=''  ">update_name,</if>
+
+
+
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="carId != null">#{carId},</if>
+            <if test="carNumber != null and carNumber != '' ">#{carNumber},</if>
+            <if test="price != null">#{price},</if>
+            <if test="litre != null">#{litre},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="petrolTime != null">#{petrolTime},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="addtime != null">#{addtime},</if>
+            <if test="isdelete != null">#{isdelete},</if>
+            <if test="updateTime != null">#{updatetime},</if>
+            <if test="upateUserid != null">#{upateUserid},</if>
+
+            <if test="driver != null and driver != '' ">#{driver},</if>
+            <if test="stationId != null   ">#{stationId},</if>
+            <if test="stationTitle != null and stationTitle != '' ">#{stationTitle},</if>
+            <if test="userName != null and userName != '' ">#{userName},</if>
+            <if test="updateName != null and updateName!='' ">#{updateName},</if>
+
+
+         </trim>
+    </insert>
+
+    <update id="updateCarPetrol" parameterType="CarPetrol">
+        update t_car_petrol
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="carId != null">car_id = #{carId},</if>
+            <if test="carNumber != null">car_number = #{carNumber},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="litre != null">litre = #{litre},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="petrolTime != null">petrol_time = #{petrolTime},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="addtime != null">addtime = #{addtime},</if>
+            <if test="isdelete != null">isdelete = #{isdelete},</if>
+            <if test="updateTime != null">updatetime = #{updateTime},</if>
+            <if test="upateUserid != null">upate_userid = #{upateUserid},</if>
+
+            <if test="driver != null and driver!=''">driver = #{driver},</if>
+            <if test="stationId != null  and stationTitle!='' ">station_id = #{stationId},</if>
+            <if test="stationTitle != null and stationTitle!=''">station_title = #{stationTitle},</if>
+            <if test="userName != null and userName!='' ">user_name = #{userName},</if>
+            <if test="updateName != null  != null and updateName!=''">update_name = #{updateName},</if>
+
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCarPetrolById" parameterType="Long">
+        delete from t_car_petrol where id = #{id}
+    </delete>
+
+    <delete id="deleteCarPetrolByIds" parameterType="String">
+        update t_car_petrol set isdelete = 1 where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oil.project.system.station.mapper.PetrolStationMapper">
+    
+    <resultMap type="PetrolStation" id="PetrolStationResult">
+        <result property="id"    column="id"    />
+        <result property="title"    column="title"    />
+        <result property="price"    column="price"    />
+        <result property="remainl"    column="remainl"    />
+        <result property="isdelete"    column="isdelete"    />
+    </resultMap>
+
+    <sql id="selectPetrolStationVo">
+        select id, title, price, remainl, isdelete from t_petrol_station
+    </sql>
+
+    <select id="selectPetrolStationList" parameterType="PetrolStation" resultMap="PetrolStationResult">
+        <include refid="selectPetrolStationVo"/>
+        <where>
+            isdelete =  0
+            <if test="title != null  and title != ''"> and title like concat('%', #{title}, '%')   </if>
+            <if test="price != null "> and price = #{price}</if>
+            <if test="remainl != null "> and remainl = #{remainl}</if>
+
+        </where>
+    </select>
+    
+    <select id="selectPetrolStationById" parameterType="Long" resultMap="PetrolStationResult">
+        <include refid="selectPetrolStationVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertPetrolStation" parameterType="PetrolStation" useGeneratedKeys="true" keyProperty="id">
+        insert into t_petrol_station
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null">title,</if>
+            <if test="price != null">price,</if>
+            <if test="remainl != null">remainl,</if>
+            <if test="isdelete != null">isdelete,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null">#{title},</if>
+            <if test="price != null">#{price},</if>
+            <if test="remainl != null">#{remainl},</if>
+            <if test="isdelete != null">#{isdelete},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePetrolStation" parameterType="PetrolStation">
+        update t_petrol_station
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null">title = #{title},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="remainl != null">remainl = #{remainl},</if>
+            <if test="isdelete != null">isdelete = #{isdelete},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePetrolStationById" parameterType="Long">
+        delete from t_petrol_station where id = #{id}
+    </delete>
+
+    <delete id="deletePetrolStationByIds" parameterType="String">
+        update  t_petrol_station set isdelete = 1    where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

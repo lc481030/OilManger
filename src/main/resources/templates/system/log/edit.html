@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改加油采购入库记录')" />
+    <th:block th:include="include :: datetimepicker-css" />
+    <th:block th:include="include :: select2-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-log-edit" th:object="${petrolLog}">
+            <input name="id" th:field="*{id}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label is-required">加油站ID：</label>
+                <div class="col-sm-8">
+<!--                    <input name="stationId" th:field="*{stationId}" class="form-control" type="text" required>-->
+
+                    <select name="stationId" class="form-control" width="50" th:field="*{stationId}">
+                        <option value="">选择加油站</option>
+                        <option th:each="station : ${stationList}" th:price = "${station.price}" th:text="${station.title}" th:value="${station.id}"></option>
+                    </select>
+                    <input name="stationTitle" th:field="*{stationTitle}"   class="form-control" type="hidden">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">单价：</label>
+                <div class="col-sm-8">
+                    <input name="price" th:field="*{price}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">总升数：</label>
+                <div class="col-sm-8">
+                    <input name="litre" th:field="*{litre}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">合计总金额：</label>
+                <div class="col-sm-8">
+                    <input name="amount" th:field="*{amount}" class="form-control" type="text">
+                </div>
+            </div>
+
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">采购时间：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <input name="buyingtime" th:value="${#dates.format(petrolLog.buyingtime, 'yyyy-MM-dd')}" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+            </div>
+
+
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <th:block th:include="include :: select2-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/log";
+        $("#form-log-edit").validate({
+            focusCleanup: true
+        });
+
+        $("select[name='stationId']").on("change",function () {
+            $("input[name='stationTitle']").val($("select[name='stationId']").find("option[value='"+this.value+"']").text());
+            if(this.value!=''){
+                $("input[name='price']").val($("select[name='stationId']").find("option[value='"+this.value+"']").attr("price")) ;
+
+                var price = $("input[name='price']").val();
+                var val = $("input[name='litre']").val();
+
+                if(price != '' && val > 0){
+                    $("input[name='amount']").val((val*price).toFixed(2));
+                }
+            }
+        });
+
+        $("input[name='litre']").on("keyup",function () {
+            var val = this.value;
+            var price = $("input[name='price']").val();
+           if(price != '' && val > 0){
+                $("input[name='amount']").val((val*price).toFixed(2));
+            }
+        });
+
+        $("input[name='price']").on("keyup",function () {
+            var val = this.value;
+            var litre = $("input[name='litre']").val();
+            if(litre != '' && val > 0){
+                $("input[name='amount']").val((val*litre).toFixed(2));
+            }
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-log-edit').serialize());
+            }
+        }
+
+        $("input[name='buyingtime']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oil.project.system.log.mapper.PetrolLogMapper">
+    
+    <resultMap type="PetrolLog" id="PetrolLogResult">
+        <result property="id"    column="id"    />
+        <result property="stationId"    column="station_id"    />
+        <result property="stationTitle"    column="station_title"    />
+        <result property="price"    column="price"    />
+        <result property="litre"    column="litre"    />
+        <result property="amount"    column="amount"    />
+        <result property="userId"    column="user_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="buyingtime"    column="buyingtime"    />
+        <result property="addtime"    column="addtime"    />
+        <result property="isdelete"    column="isdelete"    />
+        <result property="updateTime"    column="updateTime"    />
+        <result property="updateUserid"    column="update_userid"    />
+        <result property="updateName"    column="update_name"    />
+    </resultMap>
+
+    <sql id="selectPetrolLogVo">
+        select id, station_id,station_title, price, litre, amount, user_id,user_name, buyingtime, addtime, isdelete, updateTime, update_userid,update_name from t_petrol_log
+    </sql>
+
+    <select id="selectPetrolLogList" parameterType="PetrolLog" resultMap="PetrolLogResult">
+        <include refid="selectPetrolLogVo"/>
+        <where>
+          1=1 and isdelete = 0
+            <if test="stationId != null "> and station_id = #{stationId}</if>
+            <if test="price != null "> and price = #{price}</if>
+            <if test="litre != null "> and litre = #{litre}</if>
+            <if test="amount != null "> and amount = #{amount}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="buyingtime != null "> and buyingtime = #{buyingtime}</if>
+            <if test="addtime != null "> and addtime = #{addtime}</if>
+
+            <if test="updateTime != null "> and updateTime = #{updateTime}</if>
+            <if test="updateUserid != null "> and update_userid = #{updateUserid}</if>
+
+
+            <if test="params.beginBuyingtime != null and params.beginBuyingtime != ''"><!-- 开始时间检索 -->
+                AND UNIX_TIMESTAMP(buyingtime) &gt;= UNIX_TIMESTAMP(#{params.beginBuyingtime})
+            </if>
+            <if test="params.endBuyingtime != null and params.endBuyingtime != ''"><!-- 开始时间检索 -->
+                AND UNIX_TIMESTAMP(buyingtime) &lt;= UNIX_TIMESTAMP(#{params.endBuyingtime})
+            </if>
+
+
+            <if test="params.beginAddtime != null and params.beginAddtime != ''"><!-- 开始时间检索 -->
+                AND UNIX_TIMESTAMP(addtime) &gt;= UNIX_TIMESTAMP(#{params.beginAddtime})
+            </if>
+            <if test="params.endAddtime != null and params.endAddtime != ''"><!-- 开始时间检索 -->
+                AND UNIX_TIMESTAMP(addtime) &lt;=  UNIX_TIMESTAMP(#{params.endAddtime})
+            </if>
+
+        </where>
+    </select>
+    
+    <select id="selectPetrolLogById" parameterType="Long" resultMap="PetrolLogResult">
+        <include refid="selectPetrolLogVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectPetrolLogByLogId" parameterType="Long" resultMap="PetrolLogResult">
+        <include refid="selectPetrolLogVo"/>
+        where log_id = #{id}
+    </select>
+
+
+    <update id="updatePetrolLogByLogId" parameterType="PetrolLog">
+        update t_petrol_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="stationId != null">station_id = #{stationId},</if>
+            <if test="stationTitle != null and stationTitle != '' ">station_title = #{stationTitle},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="litre != null">litre = #{litre},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="userName != null and userName !='' ">user_name = #{userName},</if>
+            <if test="buyingtime != null">buyingtime = #{buyingtime},</if>
+            <if test="addtime != null">addtime = #{addtime},</if>
+            <if test="isdelete != null">isdelete = #{isdelete},</if>
+            <if test="updateTime != null">updateTime = #{updateTime},</if>
+            <if test="updateUserid != null">update_userid = #{updateUserid},</if>
+            <if test="updateName != null and updateName !='' ">update_name = #{updateName},</if>
+        </trim>
+        where log_id = #{logId}
+    </update>
+
+        
+    <insert id="insertPetrolLog" parameterType="PetrolLog" useGeneratedKeys="true" keyProperty="id">
+        insert into t_petrol_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stationId != null">station_id,</if>
+            <if test="stationTitle != null">station_title,</if>
+            <if test="price != null">price,</if>
+            <if test="litre != null">litre,</if>
+            <if test="amount != null">amount,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="userName != null">user_name,</if>
+            <if test="buyingtime != null">buyingtime,</if>
+            <if test="addtime != null">addtime,</if>
+            <if test="isdelete != null">isdelete,</if>
+            <if test="updateTime != null">updateTime,</if>
+            <if test="updateUserid != null">update_userid,</if>
+            <if test="updateName != null">update_name,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="stationId != null">#{stationId},</if>
+            <if test="stationTitle != null">#{stationTitle},</if>
+            <if test="price != null">#{price},</if>
+            <if test="litre != null">#{litre},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="userName != null">#{userName},</if>
+            <if test="buyingtime != null">#{buyingtime},</if>
+            <if test="addtime != null">#{addtime},</if>
+            <if test="isdelete != null">#{isdelete},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updateUserid != null">#{updateUserid},</if>
+            <if test="updateName != null">#{updateName},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePetrolLog" parameterType="PetrolLog">
+        update t_petrol_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="stationId != null">station_id = #{stationId},</if>
+            <if test="stationTitle != null and stationTitle != '' ">station_title = #{stationTitle},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="litre != null">litre = #{litre},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="userName != null and userName !='' ">user_name = #{userName},</if>
+            <if test="buyingtime != null">buyingtime = #{buyingtime},</if>
+            <if test="addtime != null">addtime = #{addtime},</if>
+            <if test="isdelete != null">isdelete = #{isdelete},</if>
+            <if test="updateTime != null">updateTime = #{updateTime},</if>
+            <if test="updateUserid != null">update_userid = #{updateUserid},</if>
+            <if test="updateName != null and updateName !='' ">update_name = #{updateName},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePetrolLogById" parameterType="Long">
+        delete from t_petrol_log where id = #{id}
+    </delete>
+
+    <delete id="deletePetrolLogByIds" parameterType="String">
+        update t_petrol_log set isdelete = 1  where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
