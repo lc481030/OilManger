@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('账单汇总列表')" />
+    <th:block th:include="include :: select2-css" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>车牌号：</label>
+                                <select name="carId" id="carId" class="form-control" width="50">
+                                    <option value="">选择车辆</option>
+                                    <option th:each="car : ${carList}"  th:driver="${car.driver}"   th:carNumber="${car.carNum}"   th:text="${car.carNum+'['+car.driver+']'}" th:value="${car.id}"></option>
+                                </select>
+                                <input name="carNumber" value=""  class="form-control" type="hidden">
+                                <input name="driver" value=""  class="form-control" type="hidden">
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:record:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+     <th:block th:include="include :: datetimepicker-js" />
+     <th:block th:include="include :: select2-js" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:record:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:record:remove')}]];
+        var prefix = ctx + "system/record";
+
+        $(function() {
+            var options = {
+                url: prefix + "/acountlist",
+                exportUrl: prefix + "/statisticsExport",
+                modalName: "账务记录",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'id',
+                    visible: false
+                },
+                {
+                    field: 'driver',
+                    title: '司机姓名'
+                },
+                {
+                    field: 'carNumber',
+                    title: '车牌号'
+                },
+                {
+                    field: 'amount',
+                    title: '总金额'
+                },
+                {
+                    field: 'paid',
+                    title: '实付'
+                },
+                {
+                    field: 'owe',
+                    title: '欠款'
+                },
+                ]
+            };
+            $.table.init(options);
+        });
+        $("select[name='carId']").on("change",function () {
+            $("input[name='carNumber']").val($("select[name='carId']").find("option[value='"+this.value+"']").attr("carNumber"));
+            $("input[name='driver']").val($("select[name='carId']").find("option[value='"+this.value+"']").attr("driver"));
+        });
+    </script>
+</body>
+</html>

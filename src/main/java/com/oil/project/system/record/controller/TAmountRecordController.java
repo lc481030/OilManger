@@ -6,6 +6,7 @@ import java.util.List;
 import com.oil.common.utils.DateUtils;
 import com.oil.project.system.car.domain.Car;
 import com.oil.project.system.car.service.ICarService;
+import com.oil.project.system.record.domain.StatisticsRecord;
 import com.oil.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,44 @@ public class TAmountRecordController extends BaseController
         return prefix + "/index";
     }
 
+
+    @RequiresPermissions("system:record:view")
+    @GetMapping("/acount")
+    public String acount(ModelMap mmap)
+    {
+        List<Car> list =  carService.selectCarList(new Car());
+        mmap.put("carList",list);
+        return prefix + "/acount";
+    }
+
+    /**
+     * 查询付款记录列表
+     */
+    @RequiresPermissions("system:record:list")
+    @PostMapping("/acountlist")
+    @ResponseBody
+    public TableDataInfo acountList(StatisticsRecord statisticsRecord , HttpServletRequest request)
+    {
+        startPage();
+        List<StatisticsRecord> list = tAmountRecordService.selectAcountList(statisticsRecord);
+        return getDataTable(list);
+    }
+
+
+    /**
+     * 导出付款记录列表
+     */
+    @RequiresPermissions("system:record:export")
+    @Log(title = "结算统计", businessType = BusinessType.EXPORT)
+    @PostMapping("/statisticsExport")
+    @ResponseBody
+    public AjaxResult statisticsExport(StatisticsRecord statisticsRecord, HttpServletRequest request)
+    {
+        List<StatisticsRecord> list = tAmountRecordService.selectAcountList(statisticsRecord);
+        ExcelUtil<StatisticsRecord> util = new ExcelUtil<StatisticsRecord>(StatisticsRecord.class);
+        return util.exportExcel(list, "结算统计");
+    }
+
     /**
      * 查询付款记录列表
      */
@@ -68,6 +107,7 @@ public class TAmountRecordController extends BaseController
         List<TAmountRecord> list = tAmountRecordService.selectTAmountRecordList(tAmountRecord,startDate,endDate);
         return getDataTable(list);
     }
+
 
     /**
      * 导出付款记录列表

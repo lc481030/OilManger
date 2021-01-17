@@ -1,6 +1,8 @@
 package com.oil.project.system.record.mapper;
 
 import java.util.List;
+
+import com.oil.project.system.record.domain.StatisticsRecord;
 import com.oil.project.system.record.domain.TAmountRecord;
 import org.apache.ibatis.annotations.Param;
 
@@ -59,4 +61,6 @@ public interface TAmountRecordMapper
      * @return 结果
      */
     public int deleteTAmountRecordByIds(String[] ids);
+
+    List<StatisticsRecord> selectAcountList(StatisticsRecord statisticsRecord);
 }

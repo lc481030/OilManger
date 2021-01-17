@@ -110,4 +110,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
+    <select id="selectAcountList" parameterType="StatisticsRecord" resultType="StatisticsRecord">
+        select * from cost_count_view
+        <where>
+            <if test="carNumber != null  and carNumber != ''"> and carNumber = #{carNumber}</if>
+        </where>
+    </select>
+
 </mapper>

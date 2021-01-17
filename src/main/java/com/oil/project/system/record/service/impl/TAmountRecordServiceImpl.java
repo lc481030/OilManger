@@ -1,6 +1,8 @@
 package com.oil.project.system.record.service.impl;
 
 import java.util.List;
+
+import com.oil.project.system.record.domain.StatisticsRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.oil.project.system.record.mapper.TAmountRecordMapper;
@@ -92,5 +94,10 @@ public class TAmountRecordServiceImpl implements ITAmountRecordService
     public int deleteTAmountRecordById(Long id)
     {
         return tAmountRecordMapper.deleteTAmountRecordById(id);
+    }
+
+    @Override
+    public List<StatisticsRecord> selectAcountList(StatisticsRecord statisticsRecord) {
+        return tAmountRecordMapper.selectAcountList(statisticsRecord);
     }
 }
