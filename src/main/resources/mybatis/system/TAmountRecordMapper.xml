@@ -117,4 +117,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
+
+    <select id="selectStatistics" resultType="Statistics">
+        select * from prtol_view
+    </select>
+
 </mapper>

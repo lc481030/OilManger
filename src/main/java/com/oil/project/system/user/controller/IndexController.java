@@ -2,8 +2,11 @@ package com.oil.project.system.user.controller;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+
+import com.oil.project.system.record.service.ITAmountRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -45,6 +48,9 @@ public class IndexController extends BaseController
 
     @Autowired
     private RuoYiConfig ruoYiConfig;
+
+    @Autowired
+    private ITAmountRecordService amountRecordService;
 
     // 系统首页
     @GetMapping("/index")
@@ -128,7 +134,9 @@ public class IndexController extends BaseController
     @GetMapping("/system/main")
     public String main(ModelMap mmap)
     {
+        Map map = amountRecordService.selectStatistics();
         mmap.put("version", ruoYiConfig.getVersion());
+        mmap.put("sta",map);
         return "main";
     }
     

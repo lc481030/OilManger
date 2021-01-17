@@ -1,7 +1,9 @@
 package com.oil.project.system.record.service;
 
 import java.util.List;
+import java.util.Map;
 
+import com.oil.project.system.record.domain.Statistics;
 import com.oil.project.system.record.domain.StatisticsRecord;
 import com.oil.project.system.record.domain.TAmountRecord;
 
@@ -62,4 +64,6 @@ public interface ITAmountRecordService
     public int deleteTAmountRecordById(Long id);
 
     List<StatisticsRecord> selectAcountList(StatisticsRecord statisticsRecord);
+
+    Map<String,String> selectStatistics();
 }
